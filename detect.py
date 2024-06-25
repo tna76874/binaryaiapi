@@ -10,6 +10,12 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras.models import load_model
 import shutil
 from io import BytesIO
+import sys
+
+tf.config.set_visible_devices([], 'GPU')
+
+import logging
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 
 class ImageClassifier:
@@ -30,7 +36,7 @@ class ImageClassifier:
             return float(prediction)
         
         except Exception as e:
-            print(f'AI CLASSIFY: {e}')
+            logging.info(f'AI CLASSIFY: {e}')
             return None
 
 if __name__ == '__main__':

@@ -30,7 +30,7 @@ class ImageRating(Resource):
                 return {'error': 'Invalid API key'}, 401
     
             result = classifier.classify_image(image_file.read())
-            return {'result': result}
+            return {'result': result}, 200
         
         except Exception as e:
             return {'error': e}, 400
