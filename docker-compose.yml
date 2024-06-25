@@ -2,7 +2,7 @@ services:
   aiapi:
     image: ghcr.io/tna76874/binaryaiapi:latest
     ports:
-      - "5000:5000"
+      - "5500:5000"
     container_name: aiapi
     environment:
       - CNN_API_KEY=test

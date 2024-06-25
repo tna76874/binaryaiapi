@@ -32,6 +32,7 @@ class ImageClassifier:
 
             # Vorhersage
             prediction = self.model.predict(img_array)[0][0]
+            logging.info(f'AI CLASSIFY SUCCESS: {prediction}')
             
             return float(prediction)
         
