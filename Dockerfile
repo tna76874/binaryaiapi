@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM python:3.10
 
 WORKDIR /app
 
@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -y git libgl1 libmagic1
 
 COPY requirements.txt /app/requirements.txt
-RUN pip install pipreqs && pip install -r requirements.txt && chmod -R +x /app
+RUN pip install pipreqs && pip install -r requirements.txt
 
 COPY main.py /app/main.py
 COPY detect.py /app/detect.py

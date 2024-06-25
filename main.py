@@ -12,7 +12,7 @@ app = Flask(__name__)
 api = Api(app)
 
 api_key = os.getenv('CNN_API_KEY', 'test')
-model_path = os.getenv('CNN_MODEL_PATH', 'model.keras')
+model_path = os.getenv('CNN_MODEL_PATH', 'data/model.keras')
 
 classifier = ImageClassifier(model_path = model_path)
 
