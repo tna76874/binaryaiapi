@@ -66,9 +66,10 @@ class FileLoader:
     def _get_classify_results(self):
         if len(self.pages) == 0:
             return {'cnn': None, 'blur': None, 'pass' : False}
-        
+
         cnn_status = [page.get('cnn', {}).get('status') for page in self.pages]
         blur_status = [page.get('blur', {}).get('status') for page in self.pages]
+        print([page.get('blur', {}).get('variance') for page in self.pages])
         
         cnn_pass = all(cnn_value == True for cnn_value in cnn_status)
         blur_pass = all(blur_value == False for blur_value in blur_status)
@@ -212,7 +213,7 @@ class DetectBlur:
             return {'status' : False, 'variance': None}
 
 class ImageClassifier:
-    def __init__(self, model_path = 'model.keras', threshold = 20):
+    def __init__(self, model_path = 'model.keras', threshold = 0.20):
         self.model = load_model(model_path)
         self.threshold = threshold
 
@@ -229,7 +230,6 @@ class ImageClassifier:
             logging.info(f'AI CLASSIFY SUCCESS: {prediction}')
             
             prediction = float(prediction)
-            
             status = prediction <= self.threshold
             
             return {'prediction' : prediction, 'status' : status}

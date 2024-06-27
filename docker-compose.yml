@@ -7,7 +7,7 @@ services:
     environment:
       - CNN_API_KEY=test
       - CNN_MODEL_PATH=/app/data/model.keras
-      - CNN_MODEL_THRESHOLD=20
+      - CNN_MODEL_THRESHOLD=0.2
       - BLUR_THRESHOLD=40
     volumes:
       - ./data:/app/data

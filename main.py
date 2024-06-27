@@ -13,7 +13,7 @@ api = Api(app)
 
 api_key = os.getenv('CNN_API_KEY', 'test')
 model_path = os.getenv('CNN_MODEL_PATH', 'data/model.keras')
-model_threshold = float(os.getenv('CNN_MODEL_THRESHOLD', 20))
+model_threshold = float(os.getenv('CNN_MODEL_THRESHOLD', 0.2))
 blur_threshold = float(os.getenv('BLUR_THRESHOLD', 40))
 
 classifier = ImageClassifier(model_path = model_path, threshold = model_threshold)
@@ -44,6 +44,6 @@ class ImageRating(Resource):
 api.add_resource(ImageRating, '/rate')
 
 if __name__ == '__main__':
-    app.run(debug=True, use_reloader=False)
+    app.run(debug=True, use_reloader=False, port=5500)
 
 
