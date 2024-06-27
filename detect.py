@@ -64,6 +64,9 @@ class FileLoader:
     
     @none_on_exception
     def _get_classify_results(self):
+        if len(self.pages) == 0:
+            return {'cnn': None, 'blur': None, 'pass' : False}
+        
         cnn_status = [page.get('cnn', {}).get('status') for page in self.pages]
         blur_status = [page.get('blur', {}).get('status') for page in self.pages]
         
