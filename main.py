@@ -13,8 +13,10 @@ api = Api(app)
 
 api_key = os.getenv('CNN_API_KEY', 'test')
 model_path = os.getenv('CNN_MODEL_PATH', 'data/model.keras')
+model_threshold = float(os.getenv('CNN_MODEL_THRESHOLD', 20))
+blur_threshold = float(os.getenv('BLUR_THRESHOLD', 40))
 
-classifier = ImageClassifier(model_path = model_path)
+classifier = ImageClassifier(model_path = model_path, threshold = model_threshold)
 
 class ImageRating(Resource):
     def post(self):         
@@ -28,9 +30,12 @@ class ImageRating(Resource):
                 return {'error': 'API key is required'}, 400
             if auth_key != api_key:
                 return {'error': 'Invalid API key'}, 401
-    
-            result = classifier.classify_image(image_file.read())
-            return {'result': result}, 200
+                
+            loaded = FileLoader(image_file, classifier = classifier, blur_threshold=blur_threshold).load()
+            
+            results = loaded._get_classify_results()
+            
+            return results, 200
         
         except Exception as e:
             return {'error': e}, 400

@@ -10,7 +10,6 @@ RUN pip install pipreqs && pip install -r requirements.txt
 
 COPY main.py /app/main.py
 COPY detect.py /app/detect.py
-COPY classify.py /app/classify.py
 RUN chmod -R +x /app
 
 ENV CNN_API_KEY='test'
