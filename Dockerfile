@@ -1,12 +1,4 @@
-FROM python:3.10
-
-WORKDIR /app
-
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y git libgl1 libmagic1 poppler-utils
-
-COPY requirements.txt /app/requirements.txt
-RUN pip install pipreqs && pip install -r requirements.txt
+FROM ghcr.io/tna76874/binaryaiapibase:latest
 
 COPY main.py /app/main.py
 COPY detect.py /app/detect.py
