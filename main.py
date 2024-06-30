@@ -7,6 +7,7 @@ import os
 from flask import Flask, request, jsonify
 from flask_restful import Api, Resource, reqparse
 from detect import *
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 app = Flask(__name__)
 api = Api(app)
@@ -34,6 +35,7 @@ class ImageRating(Resource):
             loaded = FileLoader(image_file, classifier = classifier, blur_threshold=blur_threshold).load()
             
             results = loaded._get_classify_results()
+            logging.info(f'RESULTS: {results}')
             
             return results, 200
         

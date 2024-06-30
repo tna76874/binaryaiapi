@@ -69,14 +69,23 @@ class FileLoader:
 
         cnn_status = [page.get('cnn', {}).get('status') for page in self.pages]
         blur_status = [page.get('blur', {}).get('status') for page in self.pages]
-        print([page.get('blur', {}).get('variance') for page in self.pages])
+        
+        # CNN Mean Prediction
+        cnn_prediction_values = np.array([page.get('cnn', {}).get('prediction') for page in self.pages if page.get('cnn', {}).get('prediction') is not None], dtype=float)
+        cnn_prediction_mean = np.mean(cnn_prediction_values) if cnn_prediction_values.size > 0 else None
+                
+        # Blur Mean Variance
+        blur_variance_values = np.array([page.get('blur', {}).get('variance') for page in self.pages if page.get('blur', {}).get('variance') is not None], dtype=float)
+        blur_variance_mean = np.mean(blur_variance_values) if blur_variance_values.size > 0 else None
         
         cnn_pass = all(cnn_value == True for cnn_value in cnn_status)
         blur_pass = all(blur_value == False for blur_value in blur_status)
         
         all_pass = cnn_pass and blur_pass
 
-        return {'cnn': cnn_pass, 'blur': blur_pass, 'pass' : all_pass}
+        results = {'cnn': cnn_pass, 'blur': blur_pass, 'pass' : all_pass, 'values' : {'cnn' : cnn_prediction_mean, 'blur' : blur_variance_mean }}
+        
+        return results
     
     @none_on_exception
     def _classify_pages(self):
@@ -227,7 +236,6 @@ class ImageClassifier:
 
             # Vorhersage
             prediction = self.model.predict(img_array)[0][0]
-            logging.info(f'AI CLASSIFY SUCCESS: {prediction}')
             
             prediction = float(prediction)
             status = prediction <= self.threshold
