@@ -36,7 +36,7 @@ def none_on_exception(func):
     return wrapper
 
 class BrightnessCheck:
-    def __init__(self, file_buffer, min_brightness=210, max_brightness=252):
+    def __init__(self, file_buffer, min_brightness=100, max_brightness=252):
         self.file_buffer = file_buffer
         self.min_brightness = min_brightness
         self.max_brightness = max_brightness
