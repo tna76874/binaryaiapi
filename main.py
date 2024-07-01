@@ -16,6 +16,7 @@ api_key = os.getenv('CNN_API_KEY', 'test')
 model_path = os.getenv('CNN_MODEL_PATH', 'data/model.keras')
 model_threshold = float(os.getenv('CNN_MODEL_THRESHOLD', 0.2))
 blur_threshold = float(os.getenv('BLUR_THRESHOLD', 40))
+ratio_tolerance = float(os.getenv('RATIO_TOLERANCE', 0.2))
 
 classifier = ImageClassifier(model_path = model_path, threshold = model_threshold)
 
@@ -32,7 +33,7 @@ class ImageRating(Resource):
             if auth_key != api_key:
                 return {'error': 'Invalid API key'}, 401
                 
-            loaded = FileLoader(image_file, classifier = classifier, blur_threshold=blur_threshold).load()
+            loaded = FileLoader(image_file, classifier = classifier, blur_threshold=blur_threshold, ratio_tolerance=ratio_tolerance).load()
             
             results = loaded._get_classify_results()
             logging.info(f'RESULTS: {results}')

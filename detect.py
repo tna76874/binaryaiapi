@@ -36,8 +36,32 @@ def none_on_exception(func):
             return None
     return wrapper
 
+class AspectRatioCheck:
+    def __init__(self, file_buffer, tolerance=0.5):
+        self.file_buffer = file_buffer
+        self.ratio = self._aspect_ratio()
+        self.normed_ratio = None
+        self.tolerance = tolerance
+
+    @none_on_exception
+    def _aspect_ratio(self):
+        image = Image.open(BytesIO(self.file_buffer))
+        width, height = image.size
+        aspect_ratio = height / width
+        return aspect_ratio
+    
+    @none_on_exception
+    def check(self):
+        if self.ratio==None:
+            return None
+        self.normed_ratio = self.ratio/np.sqrt(2)
+        if abs(self.normed_ratio - 1) <= self.tolerance:
+            return True
+        else:
+            return False
+
 class FileLoader:
-    def __init__(self, file_input, max_file_size = 15 * 1024 * 1024, filename = None, classifier = None, blur_threshold = 40):
+    def __init__(self, file_input, max_file_size = 15 * 1024 * 1024, filename = None, classifier = None, blur_threshold = 40, ratio_tolerance=0.1):
         self.attributes =   {
                             'filename' : filename,
                             }
@@ -47,6 +71,7 @@ class FileLoader:
         
         self.classifier = classifier
         self.blur_threshold = blur_threshold
+        self.ratio_tolerance = ratio_tolerance
 
     def __del__(self):
         self._close_file()
@@ -59,16 +84,18 @@ class FileLoader:
         self._close_file()
         self._generate_pages()
         self._classify_pages()
+        self._check_aspect_ratio()
         
         return self
     
     @none_on_exception
     def _get_classify_results(self):
         if len(self.pages) == 0:
-            return {'cnn': None, 'blur': None, 'pass' : False}
+            return {'ratio': None, 'cnn': None, 'blur': None, 'pass' : False}
 
         cnn_status = [page.get('cnn', {}).get('status') for page in self.pages]
         blur_status = [page.get('blur', {}).get('status') for page in self.pages]
+        ratio_status = [page.get('ratio', {}).get('status') for page in self.pages]
         
         # CNN Mean Prediction
         cnn_prediction_values = np.array([page.get('cnn', {}).get('prediction') for page in self.pages if page.get('cnn', {}).get('prediction') is not None], dtype=float)
@@ -80,10 +107,11 @@ class FileLoader:
         
         cnn_pass = all(cnn_value == True for cnn_value in cnn_status)
         blur_pass = all(blur_value == False for blur_value in blur_status)
+        ratio_pass = all(ratio_value == True for ratio_value in ratio_status)
         
-        all_pass = cnn_pass and blur_pass
+        all_pass = cnn_pass and blur_pass and ratio_pass
 
-        results = {'cnn': cnn_pass, 'blur': blur_pass, 'pass' : all_pass, 'values' : {'cnn' : cnn_prediction_mean, 'blur' : blur_variance_mean }}
+        results = {'ratio' : ratio_pass, 'cnn': cnn_pass, 'blur': blur_pass, 'pass' : all_pass, 'values' : {'cnn' : cnn_prediction_mean, 'blur' : blur_variance_mean }}
         
         return results
     
@@ -97,6 +125,14 @@ class FileLoader:
 
             self.pages[idx].update({'blur' : DetectBlur(threshold = self.blur_threshold).detect_blur(inspect)})
             
+
+    @none_on_exception
+    def _check_aspect_ratio(self):
+        for idx, page in enumerate(self.pages):
+            ratio = AspectRatioCheck(page['buffer'], tolerance=self.ratio_tolerance)
+            ratio_status = ratio.check()
+            self.pages[idx].update({'ratio' : {'status' : ratio_status, 'normed_ratio' : ratio.normed_ratio}})
+
     
     @none_on_exception
     def _generate_pages_from_pdf(self):
