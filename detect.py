@@ -36,7 +36,7 @@ def none_on_exception(func):
     return wrapper
 
 class BrightnessCheck:
-    def __init__(self, file_buffer, min_brightness=100, max_brightness=252):
+    def __init__(self, file_buffer, min_brightness=180, max_brightness=252):
         self.file_buffer = file_buffer
         self.min_brightness = min_brightness
         self.max_brightness = max_brightness
@@ -80,7 +80,13 @@ class AspectRatioCheck:
             return False
 
 class FileLoader:
-    def __init__(self, file_input, max_file_size = 15 * 1024 * 1024, filename = None, classifier = None, blur_threshold = 40, ratio_tolerance=0.1):
+    def __init__(self, file_input,
+                 max_file_size = 15 * 1024 * 1024,
+                 filename = None,
+                 classifier = None,
+                 blur_threshold = 40,
+                 ratio_tolerance=0.1,
+                 min_brightness = 180):
         self.attributes =   {
                             'filename' : filename,
                             }
@@ -91,6 +97,7 @@ class FileLoader:
         self.classifier = classifier
         self.blur_threshold = blur_threshold
         self.ratio_tolerance = ratio_tolerance
+        self.min_brightness = min_brightness
 
     def __del__(self):
         self._close_file()
@@ -162,7 +169,7 @@ class FileLoader:
     @none_on_exception
     def _check_brightness(self):
         for idx, page in enumerate(self.pages):
-            brightness = BrightnessCheck(page['buffer'])
+            brightness = BrightnessCheck(page['buffer'], min_brightness = self.min_brightness)
             brightness_status = brightness.check()
             self.pages[idx].update({'brightness' : {'status' : brightness_status, 'brightness' : brightness.brightness}})
     
