@@ -1,9 +1,9 @@
 services:
-  aiapi:
+  aiapiservice:
     image: ghcr.io/tna76874/binaryaiapi:latest
     ports:
       - "5500:5000"
-    container_name: aiapi
+    container_name: aiapiservice
     environment:
       - CNN_API_KEY=test
       - CNN_MODEL_PATH=/app/data/model.keras
@@ -11,3 +11,9 @@ services:
       - BLUR_THRESHOLD=40
     volumes:
       - ./data:/app/data
+    restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:5000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

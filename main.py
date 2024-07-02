@@ -47,9 +47,14 @@ class ImageRating(Resource):
         
         except Exception as e:
             return {'error': e}, 400
+        
+class HealthCheck(Resource):
+    def get(self):
+        return {'status': 'Server is running properly'}, 200
 
 # Add resource to API
 api.add_resource(ImageRating, '/rate')
+api.add_resource(HealthCheck, '/health')
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False, port=5500)
